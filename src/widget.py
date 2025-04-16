@@ -1,4 +1,6 @@
 import re
+from datetime import datetime
+
 
 def get_mask_card_number(card_number: str) -> str:
     """ Маскирует номер банковской карты,
@@ -70,3 +72,21 @@ def mask_account_card(account_info: str) -> str:
     else:
         return "Неверный формат ввода."
 
+
+
+def get_date(date_str: str) -> str:
+    """Преобразует дату из формата ISO в формат ДД.ММ.ГГГГ.
+
+    Параметры:
+    date_str (str): Строка с датой в формате "YYYY-MM-DDTHH:MM:SS.ssssss".
+
+    Возвращает:
+    str: Дата в формате "ДД.ММ.ГГГГ".
+    """
+    try:
+        # Преобразуем строку в объект datetime
+        date_obj = datetime.fromisoformat(date_str)
+        # Форматируем в нужный вид
+        return date_obj.strftime("%d.%m.%Y")
+    except ValueError:
+        return "Неверный формат даты"
