@@ -49,7 +49,8 @@ def get_mask_account(account_number: str) -> str:
 
 
 def mask_account_card(account_info: str) -> str:
-    """Обрабатывает информацию о банковской карте или счете и возвращает маскированный номер.
+    """Обрабатывает информацию о банковской карте
+    или счете и возвращает маскированный номер.
 
     Параметры:
     account_info (str): Строка, содержащая тип и номер карты или счета.
@@ -71,7 +72,6 @@ def mask_account_card(account_info: str) -> str:
             return f"{account_type} {get_mask_card_number(account_number)}"
     else:
         return "Неверный формат ввода."
-
 
 
 def get_date(date_str: str) -> str:
