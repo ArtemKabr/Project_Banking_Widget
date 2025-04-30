@@ -14,3 +14,12 @@ def invalid_account_number():
 @pytest.fixture
 def short_account_number():
     return '123'  # Пример короткого номера счета
+
+# Фикстура для тестов обработки операций
+@pytest.fixture
+def sample_data():
+    return [
+        {"id": 1, "state": "EXECUTED", "date": "2023-05-01T10:00:00"},
+        {"id": 2, "state": "PENDING", "date": "2023-04-01T09:00:00"},
+        {"id": 3, "state": "EXECUTED", "date": "2023-06-01T11:30:00"},
+    ]
