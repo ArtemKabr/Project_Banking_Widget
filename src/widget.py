@@ -19,7 +19,10 @@ def get_mask_card_number(card_number: str) -> str:
         raise ValueError("Номер карты должен содержать 16 цифр.")
 
     # Формируем маску
-    masked_number = f"{card_number[:4]} {card_number[4:6]}**" f" **** {card_number[-4:]}"
+    masked_number = (
+        f"{card_number[:4]} {card_number[4:6]}**"
+        f" **** {card_number[-4:]}"
+    )
 
     return masked_number
 
@@ -72,19 +75,29 @@ def mask_account_card(account_info: str) -> str:
         return "Неверный формат ввода."
 
 
+def is_leap_year(year: int) -> bool:
+    """Проверка на високосный год"""
+    return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+
+
 def get_date(date_str: str) -> str:
-    """Преобразует дату из формата ISO в формат ДД.ММ.ГГГГ.
+    """Функция для преобразования строки с датой в нужный формат"""
+    # Проверка на корректный формат с временем
+    if re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$", date_str):
+        try:
+            # Парсим дату с учетом времени (игнорируем микросекунды)
+            parsed_date = datetime.strptime(
+                date_str.split('.')[0], "%Y-%m-%dT%H:%M:%S"
+            )
 
-    Параметры:
-    date_str (str): Строка с датой в формате "YYYY-MM-DDTHH:MM:SS.ssssss".
+            # Проверка для 29 февраля в невисокосный год
+            if parsed_date.month == 2 and parsed_date.day == 29:
+                if not is_leap_year(parsed_date.year):
+                    return "Неверный формат даты"
 
-    Возвращает:
-    str: Дата в формате "ДД.ММ.ГГГГ".
-    """
-    try:
-        # Преобразуем строку в объект datetime
-        date_obj = datetime.fromisoformat(date_str)
-        # Форматируем в нужный вид
-        return date_obj.strftime("%d.%m.%Y")
-    except ValueError:
+            # Возвращаем в нужном формате
+            return parsed_date.strftime("%d.%m.%Y")
+        except ValueError:
+            return "Неверный формат даты"
+    else:
         return "Неверный формат даты"

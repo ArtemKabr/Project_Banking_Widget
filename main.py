@@ -1,10 +1,10 @@
+from src.processing import filter_by_state, sort_by_date
 from src.widget import (
     get_date,
     get_mask_account,
     get_mask_card_number,
     mask_account_card,
 )
-from src.processing import filter_by_state, sort_by_date
 
 # Тест для get_mask_card_number
 print(get_mask_card_number("7000792289606361"))

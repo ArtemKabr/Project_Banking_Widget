@@ -15,7 +15,8 @@ def get_mask_card_number(card_number: str) -> str:
         raise ValueError("Номер карты должен содержать 16 цифр.")
 
     # Формируем маску
-    masked_number = f"{card_number[:4]} {card_number[4:6]}**" f" **** {card_number[-4:]}"
+    masked_number = f"{card_number[:4]} {card_number[4:6]}**" \
+                    f" **** {card_number[-4:]}"
 
     return masked_number
 
