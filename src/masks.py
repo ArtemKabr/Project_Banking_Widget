@@ -1,5 +1,5 @@
 def get_mask_card_number(card_number: str) -> str:
-    """ Маскирует номер банковской карты,
+    """Маскирует номер банковской карты,
     отображая только первые 6 цифр и последние 4 цифры.
 
     Параметры:
@@ -15,15 +15,14 @@ def get_mask_card_number(card_number: str) -> str:
         raise ValueError("Номер карты должен содержать 16 цифр.")
 
     # Формируем маску
-    masked_number = (
-        f"{card_number[:4]} {card_number[4:6]}**" f" **** {card_number[-4:]}"
-    )
+    masked_number = f"{card_number[:4]} {card_number[4:6]}**" \
+                    f" **** {card_number[-4:]}"
 
     return masked_number
 
 
 def get_mask_account(account_number: str) -> str:
-    """ Маскирует номер банковского счета, отображая только последние 4 цифры.
+    """Маскирует номер банковского счета, отображая только последние 4 цифры.
 
     Параметры:
     account_number (str): Номер банковского счета
