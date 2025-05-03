@@ -58,9 +58,6 @@ coverage.xml
 # Pipenv
 Pipfile.lock
 
-# Poetry
-poetry.lock
-
 # Mypy
 .mypy_cache/
 .dmypy.json
