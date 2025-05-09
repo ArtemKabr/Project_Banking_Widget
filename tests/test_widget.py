@@ -1,6 +1,7 @@
 import pytest
 
-from src.widget import get_date, get_mask_account, get_mask_card_number, mask_account_card
+from src.widget import (get_date, get_mask_account,
+                        get_mask_card_number, mask_account_card)
 
 
 # Тестирование get_mask_card_number
@@ -115,5 +116,3 @@ def test_get_date_invalid(invalid_date_str):
     """Тестирование обработки некорректной даты"""
     assert get_date(invalid_date_str) == "Неверный формат даты"
     # Ожидаем ошибку для некорректного формата
-
-
