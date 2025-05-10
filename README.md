@@ -138,3 +138,35 @@ print(sorted_transactions)
 - account_card_test_cases: Для тестирования различных случаев ввода информации о банковской карте или счете.
 
 
+
+## 🌀 Модуль generators
+
+Модуль содержит генераторы для обработки больших массивов транзакций.
+
+### 📘 Функции:
+
+- `filter_by_currency(transactions: List[Dict], currency_code: str) -> Iterator[Dict]`  
+  Генератор транзакций с заданной валютой (например, `"USD"`).
+
+- `transaction_descriptions(transactions: List[Dict]) -> Iterator[str]`  
+  Итератор описаний транзакций.
+
+- `card_number_generator(start: int, stop: int) -> Iterator[str]`  
+  Генерирует номера карт в формате `XXXX XXXX XXXX XXXX`.
+
+### 📌 Примеры использования:
+
+```python
+# filter_by_currency
+for tx in filter_by_currency(transactions, "USD"):
+    print(tx)
+
+# transaction_descriptions
+for desc in transaction_descriptions(transactions):
+    print(desc)
+
+# card_number_generator
+for card in card_number_generator(1, 3):
+    print(card)
+
+
