@@ -1,5 +1,6 @@
-import sys
 import os
+import sys
+
 import pytest  # Добавляем импорт pytest
 
 # Добавляем папку src в путь для поиска модулей
