@@ -37,7 +37,6 @@ venv.bak/
 *.spec
 
 # Unit test / coverage reports
-htmlcov/
 .tox/
 .nox/
 .coverage
@@ -59,9 +58,6 @@ coverage.xml
 # Pipenv
 Pipfile.lock
 
-# Poetry
-poetry.lock
-
 # Mypy
 .mypy_cache/
 .dmypy.json
@@ -82,3 +78,6 @@ dmypy.json
 # OS
 .DS_Store
 Thumbs.db
+
+
+
