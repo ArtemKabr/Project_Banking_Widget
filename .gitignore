@@ -79,5 +79,9 @@ dmypy.json
 .DS_Store
 Thumbs.db
 
+# .env file with secrets
+.env
+
+
 
 
