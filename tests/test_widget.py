@@ -1,5 +1,4 @@
 import pytest
-
 from src.widget import (
     get_date,
     get_mask_account,
@@ -7,7 +6,6 @@ from src.widget import (
     is_leap_year,
     mask_account_card,
 )
-
 
 # ✅ Тестирование функции get_mask_card_number
 @pytest.mark.parametrize(
@@ -20,8 +18,10 @@ from src.widget import (
 )
 def test_get_mask_card_number_valid(card_number, expected):
     """
-    Проверяет корректное маскирование номеров карт.
-    Ожидается, что отображаются первые 6 и последние 4 цифры.
+    ✅ Тест: корректное маскирование номеров банковских карт.
+
+    Проверяет, что функция возвращает строку с первыми 6 и последними 4 цифрами,
+    а остальные — заменены на символы "*".
     """
     assert get_mask_card_number(card_number) == expected
 
@@ -29,15 +29,16 @@ def test_get_mask_card_number_valid(card_number, expected):
 @pytest.mark.parametrize(
     "invalid_card_number",
     [
-        "123456789012345",  # Недостаточно цифр
-        "1234abcd12345678",  # Содержит буквы
-        "",  # Пустая строка
+        "123456789012345",     # Недостаточная длина
+        "1234abcd12345678",    # Содержит недопустимые символы
+        "",                    # Пустая строка
     ],
 )
 def test_get_mask_card_number_invalid(invalid_card_number):
     """
-    Проверяет, что при передаче некорректных номеров карт (не 16 цифр)
-    вызывается исключение ValueError.
+    ✅ Тест: обработка ошибок в номерах карт.
+
+    Проверяет, что при передаче невалидного номера карты вызывается исключение ValueError.
     """
     with pytest.raises(ValueError, match="Номер карты должен содержать 16 цифр."):
         get_mask_card_number(invalid_card_number)
@@ -54,7 +55,9 @@ def test_get_mask_card_number_invalid(invalid_card_number):
 )
 def test_get_mask_account_valid(account_number, expected):
     """
-    Проверяет корректную маскировку номеров банковских счетов.
+    ✅ Тест: корректное маскирование номеров банковских счетов.
+
+    Проверяет, что возвращаются только последние 4 цифры с префиксом "**".
     """
     assert get_mask_account(account_number) == expected
 
@@ -63,13 +66,14 @@ def test_get_mask_account_valid(account_number, expected):
     "invalid_account_number",
     [
         "1234abcd",  # Содержит буквы
-        "",  # Пустая строка
+        "",          # Пустая строка
     ],
 )
 def test_get_mask_account_invalid(invalid_account_number):
     """
-    Проверяет, что при передаче некорректного номера счета
-    (буквы или пустая строка) вызывается ValueError.
+    ✅ Тест: проверка обработки нецифровых номеров счетов.
+
+    При наличии букв или пустой строки должно быть выброшено исключение.
     """
     with pytest.raises(ValueError, match="Номер счета должен содержать только цифры."):
         get_mask_account(invalid_account_number)
@@ -88,9 +92,10 @@ def test_get_mask_account_invalid(invalid_account_number):
 )
 def test_mask_account_card(account_info, expected):
     """
-    Проверяет определение типа (карта или счет)
-    и соответствующую маскировку.
-    При некорректных данных — возвращает сообщение об ошибке.
+    ✅ Тест: маскирование по типу источника — карта или счёт.
+
+    Проверяет, что функция корректно определяет тип источника
+    и вызывает соответствующую маскировку, либо возвращает сообщение об ошибке.
     """
     assert mask_account_card(account_info) == expected
 
@@ -99,16 +104,17 @@ def test_mask_account_card(account_info, expected):
 @pytest.mark.parametrize(
     "date_str, expected",
     [
-        ("2025-04-30T12:34:56", "30.04.2025"),  # обычная дата
-        ("2020-01-01T00:00:00", "01.01.2020"),  # начало года
+        ("2025-04-30T12:34:56", "30.04.2025"),
+        ("2020-01-01T00:00:00", "01.01.2020"),
         ("2024-02-29T12:00:00", "29.02.2024"),  # високосный год
-        ("2025-02-29T12:00:00", "Неверный формат даты"),  # не високосный год
+        ("2025-02-29T12:00:00", "Неверный формат даты"),  # не високосный
     ],
 )
 def test_get_date_valid(date_str, expected):
     """
-    Проверяет корректное преобразование даты в формат ДД.ММ.ГГГГ.
-    Включает тесты для високосных и не-високосных годов.
+    ✅ Тест: преобразование ISO-формата в ДД.ММ.ГГГГ.
+
+    Проверяет как обычные даты, так и обработку високосных годов.
     """
     assert get_date(date_str) == expected
 
@@ -118,26 +124,29 @@ def test_get_date_valid(date_str, expected):
     [
         "2025-04-30",  # без времени
         "30.04.2025",  # неверный формат
-        "",  # пустая строка
+        "",            # пустая строка
     ],
 )
 def test_get_date_invalid(invalid_date_str):
     """
-    Проверяет обработку некорректных строк даты.
-    Функция должна возвращать "Неверный формат даты".
+    ✅ Тест: обработка некорректных строк даты.
+
+    Проверяет, что функция возвращает сообщение об ошибке при неправильном формате.
     """
     assert get_date(invalid_date_str) == "Неверный формат даты"
 
 
-# ✅ Тестирование вспомогательной функции is_leap_year
+# ✅ Тестирование функции is_leap_year
 def test_is_leap_year_explicit():
     """
-    Проверяет логику функции is_leap_year:
-    - делится на 4 и не делится на 100 (високосный)
-    - делится на 400 (високосный)
-    - не делится на 4 (не високосный)
+    ✅ Тест: проверка условий для високосного года.
+
+    - Делится на 4 и не делится на 100 => True
+    - Делится на 400 => True
+    - Делится на 100, но не на 400 => False
+    - Не делится на 4 => False
     """
-    assert is_leap_year(2020) is True  # делится на 4 и не на 100
-    assert is_leap_year(1900) is False  # делится на 100, но не на 400
-    assert is_leap_year(2000) is True  # делится на 400
-    assert is_leap_year(2019) is False  # не делится на 4
+    assert is_leap_year(2020) is True     # делится на 4, не на 100
+    assert is_leap_year(1900) is False    # делится на 100, не на 400
+    assert is_leap_year(2000) is True     # делится на 400
+    assert is_leap_year(2019) is False    # не делится на 4

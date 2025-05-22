@@ -11,16 +11,17 @@ def log(filename: Optional[str] = None) -> Callable[[F], F]:
     """
     Декоратор логирования выполнения функции.
 
-    При успешном выполнении записывает сообщение "<имя_функции> ok".
-    При ошибке — "<имя_функции> error: <тип_ошибки>. Inputs: <args>, <kwargs>".
+    При успешном выполнении — пишет сообщение
+     "<имя_функции> ok".
+    При ошибке — пишет сообщение "<имя_функции>
+    error: <тип_ошибки>. Inputs: <args>, <kwargs>".
 
     Лог сохраняется:
-    - в консоль (stdout), если `filename` не задан
-    - в указанный файл, если передано имя файла
+    - в консоль (stdout), если `filename` не задан;
+    - в указанный файл, если передано имя файла.
 
     :param filename: Имя файла для записи логов.
-    Если None — лог выводится в консоль.
-
+                     Если None — лог выводится в консоль.
     :return: Обёрнутая функция с логированием
     """
 
@@ -32,12 +33,15 @@ def log(filename: Optional[str] = None) -> Callable[[F], F]:
             try:
                 # Вызов основной функции
                 result = func(*args, **kwargs)
-                log_message = f"{func.__name__} ok\n"  # Успешный лог
+                log_message = f"{func.__name__} ok\n"  # Сообщение об успешном выполнении
                 return result
 
             except Exception as e:
-                # Лог ошибки + параметры
-                log_message = f"{func.__name__} error: {type(e).__name__}. " f"Inputs: {args}, {kwargs}\n"
+                # Формируем сообщение об ошибке с параметрами вызова
+                log_message = (
+                    f"{func.__name__} error: {type(e).__name__}. "
+                    f"Inputs: {args}, {kwargs}\n"
+                )
                 raise  # Пробрасываем исключение дальше
 
             finally:
@@ -45,14 +49,14 @@ def log(filename: Optional[str] = None) -> Callable[[F], F]:
                 timestamp = datetime.datetime.now().isoformat()
                 final_log = f"[{timestamp}] {log_message}"
 
-                # Либо пишем в файл
+                # Запись в файл, если указан путь
                 if filename:
                     with open(filename, "a") as f:
                         f.write(final_log)
                 else:
-                    # Либо выводим в консоль
+                    # Иначе — вывод в стандартный поток
                     print(final_log, file=sys.stdout)
 
-        return cast(F, wrapper)  # Приводим тип для сохранения сигнатуры
+        return cast(F, wrapper)  # Возвращаем обёрнутую функцию с сохранением типа
 
     return decorator
