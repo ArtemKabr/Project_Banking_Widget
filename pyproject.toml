@@ -65,6 +65,8 @@ show_error_codes = true
 pretty = true
 exclude = 'venv|tests'
 
+[flake8]
+max-line-length = 119
 
 
 
