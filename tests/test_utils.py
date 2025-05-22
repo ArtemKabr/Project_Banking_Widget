@@ -1,5 +1,6 @@
 import json
 from unittest.mock import mock_open, patch
+
 from src.utils import load_operations
 
 
@@ -11,10 +12,7 @@ def test_load_operations_valid_list():
     транзакций при корректном формате JSON-файла.
     """
     # Мокаем содержимое JSON-файла: список из двух транзакций
-    mock_data = json.dumps([
-        {"id": 1, "amount": 100},
-        {"id": 2, "amount": 200}
-    ])
+    mock_data = json.dumps([{"id": 1, "amount": 100}, {"id": 2, "amount": 200}])
 
     # Подменяем open и возвращаем mock-данные при чтении файла
     with patch("builtins.open", mock_open(read_data=mock_data)):

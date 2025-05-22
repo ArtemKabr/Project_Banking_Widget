@@ -1,5 +1,7 @@
 from unittest.mock import Mock, patch
+
 import pytest
+
 from src.external_api import convert_to_rub
 
 
@@ -10,12 +12,7 @@ def test_convert_rub_no_conversion():
     Проверяет, что функция `convert_to_rub` не делает запрос к внешнему API,
     если переданная транзакция уже указана в рублях.
     """
-    transaction = {
-        "operationAmount": {
-            "amount": "1000.00",
-            "currency": {"code": "RUB"}
-        }
-    }
+    transaction = {"operationAmount": {"amount": "1000.00", "currency": {"code": "RUB"}}}
 
     # Ожидаем, что сумма возвращается без изменений и не происходит вызова API
     result = convert_to_rub(transaction)
@@ -38,12 +35,7 @@ def test_convert_usd_to_rub(mock_getenv, mock_get):
     mock_response.raise_for_status = Mock()  # Не вызывает исключения
     mock_get.return_value = mock_response
 
-    transaction = {
-        "operationAmount": {
-            "amount": "1000.00",
-            "currency": {"code": "USD"}
-        }
-    }
+    transaction = {"operationAmount": {"amount": "1000.00", "currency": {"code": "USD"}}}
 
     # Проверяем, что возвращается значение из mock'а
     result = convert_to_rub(transaction)
@@ -61,12 +53,7 @@ def test_convert_to_rub_no_api_key(mock_getenv):
     Проверяет, что функция выбрасывает исключение ValueError,
     если API ключ не найден в окружении.
     """
-    transaction = {
-        "operationAmount": {
-            "amount": "100.00",
-            "currency": {"code": "USD"}
-        }
-    }
+    transaction = {"operationAmount": {"amount": "100.00", "currency": {"code": "USD"}}}
 
     # Ожидаем ValueError с определённым сообщением
     with pytest.raises(ValueError, match="API_KEY не найден"):
@@ -87,12 +74,7 @@ def test_convert_to_rub_api_error(mock_getenv, mock_get):
     mock_response.raise_for_status.side_effect = Exception("API down")  # Имитируем сбой API
     mock_get.return_value = mock_response
 
-    transaction = {
-        "operationAmount": {
-            "amount": "100.00",
-            "currency": {"code": "EUR"}
-        }
-    }
+    transaction = {"operationAmount": {"amount": "100.00", "currency": {"code": "EUR"}}}
 
     # Проверка, что функция выбрасывает исключение от API
     with pytest.raises(Exception, match="API down"):

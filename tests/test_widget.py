@@ -1,4 +1,5 @@
 import pytest
+
 from src.widget import (
     get_date,
     get_mask_account,
@@ -6,6 +7,7 @@ from src.widget import (
     is_leap_year,
     mask_account_card,
 )
+
 
 # ✅ Тестирование функции get_mask_card_number
 @pytest.mark.parametrize(
@@ -29,9 +31,9 @@ def test_get_mask_card_number_valid(card_number, expected):
 @pytest.mark.parametrize(
     "invalid_card_number",
     [
-        "123456789012345",     # Недостаточная длина
-        "1234abcd12345678",    # Содержит недопустимые символы
-        "",                    # Пустая строка
+        "123456789012345",  # Недостаточная длина
+        "1234abcd12345678",  # Содержит недопустимые символы
+        "",  # Пустая строка
     ],
 )
 def test_get_mask_card_number_invalid(invalid_card_number):
@@ -66,7 +68,7 @@ def test_get_mask_account_valid(account_number, expected):
     "invalid_account_number",
     [
         "1234abcd",  # Содержит буквы
-        "",          # Пустая строка
+        "",  # Пустая строка
     ],
 )
 def test_get_mask_account_invalid(invalid_account_number):
@@ -124,7 +126,7 @@ def test_get_date_valid(date_str, expected):
     [
         "2025-04-30",  # без времени
         "30.04.2025",  # неверный формат
-        "",            # пустая строка
+        "",  # пустая строка
     ],
 )
 def test_get_date_invalid(invalid_date_str):
@@ -146,7 +148,7 @@ def test_is_leap_year_explicit():
     - Делится на 100, но не на 400 => False
     - Не делится на 4 => False
     """
-    assert is_leap_year(2020) is True     # делится на 4, не на 100
-    assert is_leap_year(1900) is False    # делится на 100, не на 400
-    assert is_leap_year(2000) is True     # делится на 400
-    assert is_leap_year(2019) is False    # не делится на 4
+    assert is_leap_year(2020) is True  # делится на 4, не на 100
+    assert is_leap_year(1900) is False  # делится на 100, не на 400
+    assert is_leap_year(2000) is True  # делится на 400
+    assert is_leap_year(2019) is False  # не делится на 4

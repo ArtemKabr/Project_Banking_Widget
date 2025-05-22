@@ -1,5 +1,7 @@
 import pytest
+
 from src.decorators import log
+
 
 # Тестовая функция, к которой применён декоратор log
 @log()

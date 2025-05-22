@@ -13,12 +13,11 @@
 
 import os
 import sys
+
 import pytest  # Подключение pytest
 
 # Добавляем папку src в sys.path, чтобы модули можно было импортировать
-sys.path.insert(0, os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '../src')
-))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
 
 # Фикстура: некорректный номер карты (слишком короткий)
@@ -65,10 +64,10 @@ def valid_card_numbers():
 @pytest.fixture
 def invalid_card_numbers():
     return [
-        "123456789012345",      # Меньше 16 цифр
-        "1234abcd12345678",     # Содержит буквы
-        "9876543210",           # Слишком короткий
-        "",                     # Пустая строка
+        "123456789012345",  # Меньше 16 цифр
+        "1234abcd12345678",  # Содержит буквы
+        "9876543210",  # Слишком короткий
+        "",  # Пустая строка
     ]
 
 
@@ -82,9 +81,9 @@ def valid_account_numbers():
 @pytest.fixture
 def invalid_account_numbers():
     return [
-        "1234abcd",      # Содержит буквы
-        "98765432$",     # Символы кроме цифр
-        "",              # Пустая строка
+        "1234abcd",  # Содержит буквы
+        "98765432$",  # Символы кроме цифр
+        "",  # Пустая строка
     ]
 
 

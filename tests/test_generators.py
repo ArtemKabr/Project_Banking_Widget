@@ -1,5 +1,10 @@
 import pytest
-from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
+
+from src.generators import (
+    card_number_generator,
+    filter_by_currency,
+    transaction_descriptions,
+)
 
 
 @pytest.fixture
@@ -15,13 +20,13 @@ def sample_transactions():
         {
             "id": 1,
             "operationAmount": {"currency": {"code": "USD"}},
-            "description": "USD транзакция"
+            "description": "USD транзакция",
         },
         {
             "id": 2,
             "operationAmount": {"currency": {"code": "RUB"}},
-            "description": "RUB транзакция"
-        }
+            "description": "RUB транзакция",
+        },
     ]
 
 
@@ -48,16 +53,20 @@ def test_transaction_descriptions(sample_transactions):
     assert descriptions == ["USD транзакция", "RUB транзакция"]
 
 
-@pytest.mark.parametrize("start, stop, expected", [
-    (
-        1, 3,
-        [
-            "0000 0000 0000 0001",
-            "0000 0000 0000 0002",
-            "0000 0000 0000 0003"
-        ]
-    )
-])
+@pytest.mark.parametrize(
+    "start, stop, expected",
+    [
+        (
+            1,
+            3,
+            [
+                "0000 0000 0000 0001",
+                "0000 0000 0000 0002",
+                "0000 0000 0000 0003",
+            ],
+        )
+    ],
+)
 def test_card_number_generator(start, stop, expected):
     """
     ✅ Тест: генерация номеров карт.

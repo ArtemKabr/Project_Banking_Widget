@@ -83,9 +83,7 @@ def get_date(date_str: str) -> str:
     if re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$", date_str):
         try:
             # Отбрасываем микросекунды (если есть) и преобразуем в datetime
-            parsed_date = datetime.strptime(
-                date_str.split('.')[0], "%Y-%m-%dT%H:%M:%S"
-            )
+            parsed_date = datetime.strptime(date_str.split(".")[0], "%Y-%m-%dT%H:%M:%S")
             return parsed_date.strftime("%d.%m.%Y")
         except ValueError:
             return "Неверный формат даты"

@@ -38,10 +38,7 @@ def log(filename: Optional[str] = None) -> Callable[[F], F]:
 
             except Exception as e:
                 # Формируем сообщение об ошибке с параметрами вызова
-                log_message = (
-                    f"{func.__name__} error: {type(e).__name__}. "
-                    f"Inputs: {args}, {kwargs}\n"
-                )
+                log_message = f"{func.__name__} error: {type(e).__name__}. " f"Inputs: {args}, {kwargs}\n"
                 raise  # Пробрасываем исключение дальше
 
             finally:

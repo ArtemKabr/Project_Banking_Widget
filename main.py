@@ -52,14 +52,26 @@ print(get_date("2024-03-11T02:26:18.671407"))  # → '11.03.2024'
 
 # 🔍 Демонстрационные данные для фильтрации и сортировки
 data = [
-    {"id": 41428829, "state": "EXECUTED",
-     "date": "2019-07-03T18:35:29.512364"},
-    {"id": 939719570, "state": "EXECUTED",
-     "date": "2018-06-30T02:08:58.425572"},
-    {"id": 594226727, "state": "CANCELED",
-     "date": "2018-09-12T21:27:25.241689"},
-    {"id": 615064591, "state": "CANCELED",
-     "date": "2018-10-14T08:21:33.419441"},
+    {
+        "id": 41428829,
+        "state": "EXECUTED",
+        "date": "2019-07-03T18:35:29.512364",
+    },
+    {
+        "id": 939719570,
+        "state": "EXECUTED",
+        "date": "2018-06-30T02:08:58.425572",
+    },
+    {
+        "id": 594226727,
+        "state": "CANCELED",
+        "date": "2018-09-12T21:27:25.241689",
+    },
+    {
+        "id": 615064591,
+        "state": "CANCELED",
+        "date": "2018-10-14T08:21:33.419441",
+    },
 ]
 
 # 🔎 Фильтрация по состоянию (по умолчанию — EXECUTED)
@@ -92,7 +104,6 @@ for tx in operations:
         currency = tx["operationAmount"]["currency"]["code"]
         if currency in {"USD", "EUR"}:
             rub_amount = convert_to_rub(tx)
-            print(f"ID {tx['id']}: {tx['operationAmount']['amount']} {currency} = "
-                  f"{rub_amount:.2f} RUB")
+            print(f"ID {tx['id']}: {tx['operationAmount']['amount']} {currency} = " f"{rub_amount:.2f} RUB")
     except Exception as e:
         print(f"Ошибка при конвертации операции ID {tx.get('id')}: {e}")

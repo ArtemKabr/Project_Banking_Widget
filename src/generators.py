@@ -1,8 +1,7 @@
 from typing import Dict, Iterator, List
 
 
-def filter_by_currency(transactions: List[Dict],
-                       currency_code: str) -> Iterator[Dict]:
+def filter_by_currency(transactions: List[Dict], currency_code: str) -> Iterator[Dict]:
     """
     Фильтрует транзакции по заданному коду валюты.
 
@@ -14,8 +13,7 @@ def filter_by_currency(transactions: List[Dict],
     :return: Итератор транзакций с заданной валютой
     """
     return (
-        tx for tx in transactions
-        if tx.get("operationAmount", {}).get("currency", {}).get("code") == currency_code
+        tx for tx in transactions if tx.get("operationAmount", {}).get("currency", {}).get("code") == currency_code
     )
 
 
