@@ -1,3 +1,6 @@
+from src.masks_logger import logger as masks_logger
+
+
 def get_mask_card_number(card_number: str) -> str:
     """
     Маскирует номер банковской карты, отображая только первые 6 и последние 4 цифры.
@@ -14,10 +17,12 @@ def get_mask_card_number(card_number: str) -> str:
     """
     # Проверка: длина должна быть ровно 16 символов и все — цифры
     if len(card_number) != 16 or not card_number.isdigit():
+        masks_logger.error("Неверный номер карты: %s", card_number)
         raise ValueError("Номер карты должен содержать 16 цифр.")
 
     # Маскируем средние 6 цифр карты, оставляя первые 6 и последние 4
     masked_number = f"{card_number[:4]} {card_number[4:6]}** **** {card_number[-4:]}"
+    masks_logger.debug("Маскирование номера карты: %s -> %s", card_number, masked_number)
     return masked_number
 
 
@@ -37,8 +42,10 @@ def get_mask_account(account_number: str) -> str:
     """
     # Проверка: строка должна состоять только из цифр
     if not account_number.isdigit():
+        masks_logger.error("Неверный номер счета: %s", account_number)
         raise ValueError("Номер счета должен содержать только цифры.")
 
     # Маскируем все, кроме последних 4 цифр
     masked_account = f"**{account_number[-4:]}"
+    masks_logger.debug("Маскирование номера счета: %s -> %s", account_number, masked_account)
     return masked_account
