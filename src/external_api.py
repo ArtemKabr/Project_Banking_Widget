@@ -1,8 +1,10 @@
 import os
+import time
 from typing import Any
 
 import requests
 from dotenv import load_dotenv
+from src.utils_logger import logger as utils_logger
 
 # Загружаем переменные окружения из .env файла
 load_dotenv()
@@ -28,35 +30,73 @@ def convert_to_rub(transaction: dict[str, Any]) -> float:
                         }
     :return: Сумма в рублях (float)
     :raises ValueError: если API_KEY отсутствует в переменных окружения
-    :raises requests.HTTPError: если запрос к API завершился ошибкой
     """
-    # Извлекаем сумму транзакции
     amount = float(transaction["operationAmount"]["amount"])
-    # Извлекаем код валюты
     currency = transaction["operationAmount"]["currency"]["code"]
 
-    # Если валюта уже рубли, возвращаем сумму без изменений
     if currency == "RUB":
+        utils_logger.debug("Пропуск конвертации — валюта уже RUB: %.2f", amount)
         return amount
 
-    # Получаем API ключ из переменных окружения
     api_key = os.getenv("API_KEY")
     if not api_key:
+        utils_logger.error("API_KEY не найден в переменных окружения")
         raise ValueError("API_KEY не найден в переменных окружения")
 
-    # Адрес API для конвертации валют
     url = "https://api.apilayer.com/exchangerates_data/convert"
-    # Параметры запроса: из какой валюты, в какую и сколько
     params = {"to": "RUB", "from": currency, "amount": amount}
-    # Заголовок с API ключом
     headers = {"apikey": api_key}
 
-    # Отправляем GET-запрос к API
-    response = requests.get(url, params=params, headers=headers, timeout=10)
-    # Проверяем наличие HTTP ошибок
-    response.raise_for_status()
-    # Преобразуем ответ в JSON
-    data = response.json()
+    retries = 3
+    delay = 1
 
-    # Извлекаем и возвращаем сконвертированную сумму
-    return float(data["result"])
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, params=params, headers=headers, timeout=(5))
+            response.raise_for_status()
+
+            if response.status_code == 200:
+                utils_logger.info(
+                    "[RATE-LIMIT] Осталось сегодня: %s/%s, в месяц: %s/%s",
+                    response.headers.get("x-ratelimit-remaining-day", "?"),
+                    response.headers.get("x-ratelimit-limit-day", "?"),
+                    response.headers.get("x-ratelimit-remaining-month", "?"),
+                    response.headers.get("x-ratelimit-limit-month", "?"),
+                )
+
+            data = response.json()
+            result = float(data["result"])
+            utils_logger.debug("Успешная конвертация: %s %.2f -> RUB %.2f", currency, amount, result)
+            return result
+
+        except requests.HTTPError as e:
+            if e.response is not None and e.response.status_code == 429:
+                utils_logger.warning(
+                    "Попытка %d: Превышен лимит API (429). Повтор через %d сек.",
+                    attempt + 1, delay
+                )
+                utils_logger.warning("429: лимит запросов превышен — заголовки лимитов недоступны.")
+                time.sleep(delay)
+                delay *= 2
+            else:
+                utils_logger.error(
+                    "Ошибка HTTP при конвертации ID %s: %s",
+                    transaction.get("id", "неизвестно"), str(e)
+                )
+                raise
+
+        except Exception as e:
+            utils_logger.error("Непредвиденная ошибка при конвертации: %s", str(e))
+            raise
+
+    # 🔁 После 3-х неудачных попыток используем fallback-курс
+    # === НАЧАЛО ЗАГЛУШКИ (можно удалить при переходе на платный API) ===
+    fallback_rate = 90 if currency == "USD" else 100
+    fallback_value = round(amount * fallback_rate, 2)
+    utils_logger.warning(
+        "Использован fallback-курс для %s: %.2f * %d = %.2f",
+        currency, amount, fallback_rate, fallback_value
+    )
+    return fallback_value
+    # === КОНЕЦ ЗАГЛУШКИ ===
+
