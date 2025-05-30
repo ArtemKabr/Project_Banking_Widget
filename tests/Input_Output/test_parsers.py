@@ -14,7 +14,7 @@ def test_read_csv_transactions(mock_read_csv):
     assert isinstance(result, list)
     assert result[0]["id"] == 1
     assert result[1]["amount"] == 200
-    mock_read_csv.assert_called_once_with("dummy_path.csv")
+    mock_read_csv.assert_called_once_with("dummy_path.csv", delimiter=";")
 
 
 @patch("pandas.read_excel")

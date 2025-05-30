@@ -54,6 +54,7 @@ def convert_to_rub(transaction: dict[str, Any]) -> float:
         try:
             response = requests.get(url, params=params, headers=headers, timeout=(2, 5))
             response.raise_for_status()
+            # print(response.text)
 
             if response.status_code == 200:
                 utils_logger.info(
