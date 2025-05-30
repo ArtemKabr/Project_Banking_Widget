@@ -9,7 +9,8 @@ main.py — демонстрация и отладка функций проек
 - фильтрацию и сортировку по состоянию и дате;
 - конвертацию валют (USD, EUR → RUB) через внешний API.
 """
-
+import time
+from src.Input_Output.parsers import read_csv_transactions, read_excel_transactions
 from src.external_api import convert_to_rub
 from src.processing import filter_by_state, sort_by_date
 from src.utils import load_operations
@@ -97,6 +98,7 @@ for item in sorted_asc:
 # 💱 Конвертация валют в рубли через внешний API
 print("\n💱 Конвертация USD/EUR в RUB:")
 
+
 for tx in operations:
     if not tx:
         continue
@@ -104,6 +106,24 @@ for tx in operations:
         currency = tx["operationAmount"]["currency"]["code"]
         if currency in {"USD", "EUR"}:
             rub_amount = convert_to_rub(tx)
-            print(f"ID {tx['id']}: {tx['operationAmount']['amount']} {currency} = " f"{rub_amount:.2f} RUB")
+            print(f"ID {tx['id']}: {tx['operationAmount']['amount']} {currency} = {rub_amount:.2f} RUB")
+            time.sleep(1)  # Добавляем паузу между запросами
     except Exception as e:
         print(f"Ошибка при конвертации операции ID {tx.get('id')}: {e}")
+
+
+# 📥 Загрузка операций из CSV и Excel-файлов (демонстрация)
+
+csv_path = "data/transactions.csv"
+excel_path = "data/transactions_excel.xlsx"
+
+csv_transactions = read_csv_transactions(csv_path)
+excel_transactions = read_excel_transactions(excel_path)
+
+print("\n📄 CSV транзакции:")
+for tx in csv_transactions:
+    print(tx)
+
+print("\n📊 Excel транзакции:")
+for tx in excel_transactions:
+    print(tx)
