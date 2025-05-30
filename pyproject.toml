@@ -27,6 +27,7 @@ flake8 = "^7.2.0"
 pre-commit = "^4.2.0"
 mypy = "^1.15.0"
 isort = "^6.0.1"
+pytest-cov = "^6.1.1"
 
 [tool.black]
 line-length = 119
@@ -64,6 +65,8 @@ show_error_codes = true
 pretty = true
 exclude = 'venv|tests'
 
+[flake8]
+max-line-length = 119
 
 
 
