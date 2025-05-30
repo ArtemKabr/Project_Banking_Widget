@@ -4,6 +4,7 @@ from typing import Any
 
 import requests
 from dotenv import load_dotenv
+
 from src.utils_logger import logger as utils_logger
 
 # Загружаем переменные окружения из .env файла
@@ -70,7 +71,6 @@ def convert_to_rub(transaction: dict[str, Any]) -> float:
             utils_logger.debug("Успешная конвертация: %s %.2f -> RUB %.2f", currency, amount, result)
             return result
 
-
         except requests.HTTPError as e:
             if e.response is not None and e.response.status_code == 429:
                 if attempt == retries - 1:
@@ -103,4 +103,3 @@ def convert_to_rub(transaction: dict[str, Any]) -> float:
     )
     return fallback_value
     # === КОНЕЦ ЗАГЛУШКИ ===
-

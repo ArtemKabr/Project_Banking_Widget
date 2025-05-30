@@ -1,4 +1,5 @@
-from typing import List, Dict, Any, cast
+from typing import Any, Dict, List, cast
+
 import pandas as pd
 
 
@@ -20,4 +21,3 @@ def read_excel_transactions(path: str) -> List[Dict[str, Any]]:
     """
     df = pd.read_excel(path)
     return cast(List[Dict[str, Any]], df.to_dict(orient="records"))
-

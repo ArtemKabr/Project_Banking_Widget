@@ -1,5 +1,5 @@
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from src.Input_Output.parsers import read_csv_transactions, read_excel_transactions
 
 

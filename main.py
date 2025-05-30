@@ -2,10 +2,11 @@
 main.py — демонстрация и отладка функций проекта Project_Banking_Widget.
 """
 
-import time
 import os
+import time
+
 import pandas as pd
-from src.Input_Output.parsers import read_csv_transactions, read_excel_transactions
+
 from src.external_api import convert_to_rub
 from src.processing import filter_by_state, sort_by_date
 from src.utils import load_operations
@@ -17,7 +18,7 @@ from src.widget import (
 )
 
 
-def show_transactions():
+def show_transactions() -> None:
     # 📁 Убедимся, что папка data существует
     os.makedirs("data", exist_ok=True)
 
@@ -94,7 +95,6 @@ def show_transactions():
         print("✅ Excel сохранён в data/transactions_copy.xlsx")
     except Exception as e:
         print(f"❌ Ошибка при чтении Excel: {e}")
-
 
 
 if __name__ == "__main__":
