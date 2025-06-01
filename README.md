@@ -271,3 +271,19 @@ widget, processing, utils, external_api, generators, decorators.
 
 Фикстура account_card_test_cases — проверка различных форматов ввода (карта/счёт).
 
+
+
+---
+
+## 📂 Модуль Input_Output.parsers
+
+Добавлена поддержка новых источников данных:
+
+- `read_csv_transactions(path: str) -> list[dict]`  
+  Считывает транзакции из CSV-файла, возвращает список словарей.
+
+- `read_excel_transactions(path: str) -> list[dict]`  
+  Считывает транзакции из Excel-файла, возвращает список словарей.
+
+Файлы размещаются в папке `data/`, поддержка форматов `.csv` и `.xlsx`.
+

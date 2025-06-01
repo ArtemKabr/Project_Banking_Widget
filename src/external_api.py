@@ -4,6 +4,7 @@ from typing import Any
 
 import requests
 from dotenv import load_dotenv
+
 from src.utils_logger import logger as utils_logger
 
 # Загружаем переменные окружения из .env файла
@@ -52,8 +53,9 @@ def convert_to_rub(transaction: dict[str, Any]) -> float:
 
     for attempt in range(retries):
         try:
-            response = requests.get(url, params=params, headers=headers, timeout=(5))
+            response = requests.get(url, params=params, headers=headers, timeout=(2, 5))
             response.raise_for_status()
+            # print(response.text)
 
             if response.status_code == 200:
                 utils_logger.info(
@@ -71,6 +73,12 @@ def convert_to_rub(transaction: dict[str, Any]) -> float:
 
         except requests.HTTPError as e:
             if e.response is not None and e.response.status_code == 429:
+                if attempt == retries - 1:
+                    utils_logger.warning(
+                        "Попытка %d: Лимит API превышен (429). Прерываем повторы — переходим к fallback.",
+                        attempt + 1
+                    )
+                    break  # Прерываем цикл и переходим к заглушке
                 utils_logger.warning(
                     "Попытка %d: Превышен лимит API (429). Повтор через %d сек.",
                     attempt + 1, delay
@@ -85,10 +93,6 @@ def convert_to_rub(transaction: dict[str, Any]) -> float:
                 )
                 raise
 
-        except Exception as e:
-            utils_logger.error("Непредвиденная ошибка при конвертации: %s", str(e))
-            raise
-
     # 🔁 После 3-х неудачных попыток используем fallback-курс
     # === НАЧАЛО ЗАГЛУШКИ (можно удалить при переходе на платный API) ===
     fallback_rate = 90 if currency == "USD" else 100
@@ -99,4 +103,3 @@ def convert_to_rub(transaction: dict[str, Any]) -> float:
     )
     return fallback_value
     # === КОНЕЦ ЗАГЛУШКИ ===
-
