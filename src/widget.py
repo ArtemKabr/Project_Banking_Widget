@@ -3,19 +3,24 @@ from datetime import datetime
 from typing import Any
 
 
-def get_mask_card_number(card_number: str) -> str:
+def mask_account_card(account_info: str) -> str:
     """
-    Маскирует номер банковской карты, отображая только первые 6 и последние 4 цифры.
-
-    Формат маскирования: 'XXXX XX** **** XXXX'
-
-    :param card_number: Строка из 16 цифр
-    :return: Маскированная строка
-    :raises ValueError: Если строка не является валидным номером карты
+    Определяет тип источника (счёт или карта) и применяет соответствующую маскировку.
+    Если формат неизвестен или невалиден — возвращает сообщение об ошибке.
     """
-    if len(card_number) != 16 or not card_number.isdigit():
-        raise ValueError("Номер карты должен содержать 16 цифр.")
-    return f"{card_number[:4]} {card_number[4:6]}** **** {card_number[-4:]}"
+    if not isinstance(account_info, str) or not account_info.strip():
+        return "Неверный формат ввода."
+
+    try:
+        prefix, number = account_info.strip().split(" ", 1)
+        if prefix.lower() in {"счет", "счёт"}:
+            return f"{prefix} {get_mask_account(number)}"
+        elif prefix.lower() in {"карта", "maestro", "mastercard", "visa", "american", "discover"}:
+            return f"{prefix} {get_mask_card_number(number)}"
+    except Exception:
+        pass
+
+    return "Неверный формат ввода."
 
 
 def get_mask_account(account_number: str) -> str:
@@ -33,7 +38,22 @@ def get_mask_account(account_number: str) -> str:
     return f"**{account_number[-4:]}"
 
 
-def mask_account_card(account_info: Any) -> str:
+def get_mask_card_number(card_number: str) -> str:
+    """
+    Маскирует номер карты, оставляя первые 6 и последние 4 цифры.
+
+    Пример: '1234567812345678' → '1234 56** **** 5678'
+
+    :param card_number: Строка из 16 цифр
+    :return: Маскированный номер карты
+    :raises ValueError: Если длина не 16 или содержит недопустимые символы
+    """
+    if not card_number.isdigit() or len(card_number) != 16:
+        raise ValueError("Номер карты должен содержать 16 цифр.")
+    return f"{card_number[:4]} {card_number[4:6]}** **** {card_number[-4:]}"
+
+
+def get_mask_account_card(account_info: Any) -> str:
     """
     Маскирует номер карты или счёта из строки вида "<Тип> <Номер>".
     • Если вход не строка или пустой – возвращает "<не указано>".
@@ -58,7 +78,10 @@ def mask_account_card(account_info: Any) -> str:
     # 3️⃣  Маскирование
     if "Счет" in account_type:       # можно добавить lower(), если нужен регистр-независимый поиск
         return f"{account_type} {get_mask_account(account_number)}"
-    return f"{account_type} {get_mask_card_number(account_number)}"
+    try:
+        return f"{account_type} {get_mask_card_number(account_number)}"
+    except Exception:
+        return account_info  # если маскировка не удалась — вернуть как есть
 
 
 def is_leap_year(year: int) -> bool:

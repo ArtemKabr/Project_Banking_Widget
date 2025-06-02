@@ -1,5 +1,6 @@
 import pytest
-from src.analytics import search_transactions_by_description, count_transaction_categories
+
+from src.analytics import count_transaction_categories, search_transactions_by_description
 
 
 @pytest.fixture

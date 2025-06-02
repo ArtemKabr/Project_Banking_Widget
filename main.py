@@ -4,8 +4,10 @@ main.py — демонстрация и пользовательский инт�
 
 import os
 import time
+
 import pandas as pd
 
+from src.analytics import count_transaction_categories, search_transactions_by_description
 from src.external_api import convert_to_rub
 from src.processing import filter_by_state, sort_by_date
 from src.utils import load_operations
@@ -15,7 +17,6 @@ from src.widget import (
     get_mask_card_number,
     mask_account_card,
 )
-from src.analytics import search_transactions_by_description, count_transaction_categories
 
 
 def show_transactions() -> None:
