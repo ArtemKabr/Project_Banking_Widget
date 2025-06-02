@@ -287,3 +287,71 @@ widget, processing, utils, external_api, generators, decorators.
 
 Файлы размещаются в папке `data/`, поддержка форматов `.csv` и `.xlsx`.
 
+
+
+🧠 Модуль analytics
+
+Добавлены функции для анализа транзакций: поиск по описанию и подсчёт категорий.
+
+🔍 Поиск по описанию транзакции
+
+search_transactions_by_description(transactions: list[dict], query: str) -> list[dict]
+Возвращает список транзакций, в которых description содержит заданную подстроку (поиск нечувствителен к регистру).
+
+Пример:
+from src.analytics import search_transactions_by_description
+
+result = search_transactions_by_description(transactions, "перевод")
+
+📊 Подсчёт категорий транзакций
+
+count_transaction_categories(transactions: list[dict]) -> dict[str, int]
+Возвращает словарь с количеством каждой категории операций (на основе description).
+
+Пример:
+from src.analytics import count_transaction_categories
+
+result = count_transaction_categories(transactions)
+# {'Открытие вклада': 1, 'Перевод организации': 3, ...}
+
+💬 Интерфейс пользователя (main.py)
+
+Функция main() предоставляет CLI-интерфейс для взаимодействия с пользователем:
+
+Выбор источника данных (JSON, CSV, XLSX)
+
+Ввод статуса транзакций (EXECUTED, CANCELED, PENDING)
+
+Сортировка по дате (опционально)
+
+Фильтрация по валюте (RUB — опционально)
+
+Поиск по описанию (опционально)
+
+Вывод операций с форматированием
+
+Статистика по категориям операций
+
+📌 Пример запуска:
+python main.py
+
+
+📋 Пример вывода:
+
+📥 Выберите источник данных:
+1. JSON
+2. CSV
+3. XLSX
+
+✅ Отфильтровано по статусу: EXECUTED
+📋 Всего операций: 3
+
+08.12.2019 Открытие вклада
+Счет **4321
+Сумма: 40542 руб.
+
+...
+
+📊 Категории:
+Открытие вклада: 1
+Перевод организации: 2

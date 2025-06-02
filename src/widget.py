@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from typing import Any
 
 
 def get_mask_card_number(card_number: str) -> str:
@@ -32,28 +33,32 @@ def get_mask_account(account_number: str) -> str:
     return f"**{account_number[-4:]}"
 
 
-def mask_account_card(account_info: str) -> str:
+def mask_account_card(account_info: Any) -> str:
     """
-    Определяет, является ли переданная строка номером карты или счёта,
-    и возвращает соответствующую маскированную строку.
-
-    Поддерживаемый формат: "<Тип> <Номер>", например:
-        - "Visa 1234567890123456"
-        - "Счет 40817810099910004312"
-
-    :param account_info: Строка с типом и номером
-    :return: Маскированная строка или сообщение об ошибке
+    Маскирует номер карты или счёта из строки вида "<Тип> <Номер>".
+    • Если вход не строка или пустой – возвращает "<не указано>".
+    • Если строка не подходит под шаблон – возвращает её как есть
+      (не бросаем исключение).
     """
-    # Используем регулярное выражение для разделения типа и номера
-    match = re.match(r"(\D+)\s(\d+)", account_info.strip())
-    if match:
-        account_type = match.group(1).strip()
-        account_number = match.group(2).strip()
-        if "Счет" in account_type:
-            return f"{account_type} {get_mask_account(account_number)}"
-        else:
-            return f"{account_type} {get_mask_card_number(account_number)}"
-    return "Неверный формат ввода."
+    # 1️⃣  Защита от None, NaN, чисел и пр.
+    if not isinstance(account_info, str):
+        return "<не указано>"
+
+    account_info = account_info.strip()
+    if not account_info:
+        return "<не указано>"
+
+    # 2️⃣  Разбор строки "<Тип> <Номер>"
+    match = re.match(r"(\D+)\s+(\d+)", account_info)
+    if not match:
+        return account_info          # не подошло под шаблон – выводим как есть
+
+    account_type, account_number = match.groups()
+
+    # 3️⃣  Маскирование
+    if "Счет" in account_type:       # можно добавить lower(), если нужен регистр-независимый поиск
+        return f"{account_type} {get_mask_account(account_number)}"
+    return f"{account_type} {get_mask_card_number(account_number)}"
 
 
 def is_leap_year(year: int) -> bool:

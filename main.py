@@ -1,10 +1,9 @@
 """
-main.py — демонстрация и отладка функций проекта Project_Banking_Widget.
+main.py — демонстрация и пользовательский интерфейс для Project_Banking_Widget.
 """
 
 import os
 import time
-
 import pandas as pd
 
 from src.external_api import convert_to_rub
@@ -16,13 +15,15 @@ from src.widget import (
     get_mask_card_number,
     mask_account_card,
 )
+from src.analytics import search_transactions_by_description, count_transaction_categories
 
 
 def show_transactions() -> None:
-    # 📁 Убедимся, что папка data существует
+    """
+    Демонстрация функций проекта: загрузка, маскирование, сортировка, преобразование и т.д.
+    """
     os.makedirs("data", exist_ok=True)
 
-    # 🔄 Загрузка операций из JSON-файла
     operations = load_operations("data/operations.json")
     print(f"Загружено операций: {len(operations)}")
 
@@ -32,16 +33,13 @@ def show_transactions() -> None:
             print(op)
             break
 
-    # 🛡️ Маскирование
     print(get_mask_card_number("7000792289606361"))
     print(get_mask_account("700079228960636"))
     print(mask_account_card("Maestro 1596837868705199"))
     print(mask_account_card("Счет 64686473678894779589"))
 
-    # 📅 Преобразование даты
     print(get_date("2024-03-11T02:26:18.671407"))
 
-    # 🔍 Демонстрационные данные
     data = [
         {"id": 1, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
         {"id": 2, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
@@ -60,7 +58,6 @@ def show_transactions() -> None:
     for item in sort_by_date(data, descending=False):
         print(item)
 
-    # 💱 Конвертация валют
     print("\n💱 Конвертация USD/EUR в RUB:")
     for tx in operations:
         if not tx:
@@ -74,7 +71,6 @@ def show_transactions() -> None:
         except Exception as e:
             print(f"Ошибка при конвертации операции ID {tx.get('id')}: {e}")
 
-    # 📥 Загрузка CSV и Excel с рабочего стола
     csv_path = "data/transactions.csv"
     excel_path = "data/transactions_excel.xlsx"
 
@@ -97,5 +93,194 @@ def show_transactions() -> None:
         print(f"❌ Ошибка при чтении Excel: {e}")
 
 
+def load_transactions() -> list[dict]:
+    """
+    Загружает транзакции из JSON, CSV или XLSX — выбор пользователя.
+    """
+    while True:
+        print("\n📥 Выберите источник данных:")
+        print("1. JSON")
+        print("2. CSV")
+        print("3. XLSX")
+        choice = input("Ваш выбор: ")
+
+        try:
+            if choice == "1":
+                return load_operations("data/operations.json")
+            elif choice == "2":
+                return pd.read_csv("data/transactions.csv", delimiter=";").to_dict(orient="records")
+            elif choice == "3":
+                # Не забудьте установить openpyxl: poetry add openpyxl
+                return pd.read_excel("data/transactions_excel.xlsx").to_dict(orient="records")
+            else:
+                print("Неверный выбор. Повторите ввод.")
+        except Exception as e:
+            print(f"❌ Ошибка при загрузке файла: {e}")
+
+
+def ask_status() -> str:
+    """
+    Запрашивает статус транзакции у пользователя с выбором по цифрам.
+    """
+    options = {
+        "1": "EXECUTED",
+        "2": "CANCELED",
+        "3": "PENDING",
+    }
+    while True:
+        print("📌 Выберите статус операций:")
+        print("1. EXECUTED")
+        print("2. CANCELED")
+        print("3. PENDING")
+        choice = input("Ваш выбор: ").strip()
+        if choice in options:
+            return options[choice]
+        print(f"❌ Неверный выбор: {choice}. Повторите.")
+
+
+def ask_yes_no(prompt: str) -> bool:
+    """
+    Спрашивает «Да/Нет» до тех пор, пока пользователь не введёт
+    корректный ответ. Возвращает True для «да», False для «нет».
+    Допустимы ответы: да | y | yes  ― и  нет | n | no
+    Регистр и пробелы игнорируются.
+    """
+    valid_yes = {"да", "y", "yes"}
+    valid_no = {"нет", "n", "no"}
+    while True:
+        answer = input(f"{prompt} (Да/Нет): ").strip().lower()
+        if answer in valid_yes:
+            return True
+        if answer in valid_no:
+            return False
+        print("❌ Пожалуйста, введите 'Да' или 'Нет'.")
+
+
+def ask_sort_order() -> bool:
+    """
+    Спрашивает порядок сортировки.
+    ▸ Возвращает False — по возрастанию (старые → новые)
+    ▸ Возвращает True  — по убыванию   (новые → старые)
+    Принимает:
+        1 / возрастание / вверх / asc
+        2 / убывание    / вниз  / desc
+    """
+    asc_variants = {"1", "возрастание", "вверх", "asc", "по возрастанию"}
+    desc_variants = {"2", "убывание", "вниз", "desc", "по убыванию"}
+    while True:
+        answer = input("Сортировать по возрастанию или убыванию? (1/2): ").strip().lower()
+        if answer in asc_variants:
+            return False            # возрастание
+        if answer in desc_variants:
+            return True             # убывание
+        print("❌ Неверный ввод. Введите 1 (возрастание) или 2 (убывание).")
+
+
+def print_transaction(tx: dict):
+    print(get_date(tx["date"]))
+    print(tx["description"])
+    if "from" in tx:
+        print(mask_account_card(tx["from"]), end=" -> ")
+    if "to" in tx:
+        print(mask_account_card(tx["to"]))
+    amount = tx.get("operationAmount", {}).get("amount") or tx.get("amount")
+    currency = (
+        tx.get("operationAmount", {}).get("currency", {}).get("code")
+        or tx.get("currency")
+    )
+    print(f"Сумма: {amount} {currency}\n")
+
+
+def main():
+    """
+    Основной пользовательский интерфейс для работы с транзакциями.
+    """
+    print("👋 Добро пожаловать в Project Banking Widget!")
+    transactions = load_transactions()
+
+    if not transactions:
+        print("❌ Нет доступных операций.")
+        return
+
+    status = ask_status()
+    filtered = filter_by_state(transactions, status)
+    print(f"✅ Отфильтровано по статусу: {status}")
+
+    if ask_yes_no("Отсортировать по дате?"):
+        descending = ask_sort_order()
+        filtered = sort_by_date(filtered, descending)
+
+    # ───────────── Фильтр: только операции в RUB ─────────────
+    if ask_yes_no("Показать только рублевые операции?"):
+        # Проверяем, встречается ли вообще валюта RUB среди уже отфильтрованных операций
+        has_rub = any(
+            (tx.get("operationAmount", {}).get("currency", {}).get("code") == "RUB")
+            or (tx.get("currency") == "RUB")
+            for tx in filtered
+        )
+
+        if has_rub:
+            filtered = [
+                tx for tx in filtered
+                if (
+                        tx.get("operationAmount", {}).get("currency", {}).get("code") == "RUB"
+                        or tx.get("currency") == "RUB"
+                )
+            ]
+            print(f"💸 Операций в RUB осталось: {len(filtered)}")
+        else:
+            print("⚠️ Среди выбранных транзакций вообще нет валюты RUB — фильтрация пропущена.")
+    # ─────────────────────────────────────────────────────────
+
+    if ask_yes_no("Фильтровать по описанию?"):
+        query = input("Введите подстроку для поиска: ")
+        filtered = search_transactions_by_description(filtered, query)
+
+    # ─────────── Когда после всех фильтров список пуст ───────────
+    if not filtered:
+        print("⚠️ Ни одной операции не найдено.")
+
+        # Собираем уникальные описания среди операций c тем  
+        # же статусом (без валютного фильтра, чтобы дать максимум вариантов)
+        fallback_pool = filter_by_state(transactions, status)
+        descriptions = sorted({tx.get("description", "<без описания>") for tx in fallback_pool})
+
+        if not descriptions:
+            print("❌ В этих операциях даже описаний нет — ничего предложить.")
+            return
+
+        # Показываем список с номерами
+        print("\n🔍 Доступные описания:")
+        for i, desc in enumerate(descriptions, 1):
+            print(f"{i}. {desc}")
+
+        try:
+            choice = int(input("\nВведите номер описания для повторного поиска: "))
+            chosen_desc = descriptions[choice - 1]
+        except (ValueError, IndexError):
+            print("❌ Неверный номер. Завершаю.")
+            return
+
+        # Повторная фильтрация уже по выбранному описанию
+        filtered = [
+            tx for tx in fallback_pool
+            if chosen_desc in tx.get("description", "")
+        ]
+
+        if not filtered:
+            print("⚠️ По выбранному описанию тоже ничего не найдено.")
+            return
+    # ──────────────────────────────────────────────────────────────
+
+    print(f"\n📋 Всего операций: {len(filtered)}\n")
+    for tx in filtered:
+        print_transaction(tx)
+
+    print("📊 Категории:")
+    for category, count in count_transaction_categories(filtered).items():
+        print(f"{category}: {count}")
+
+
 if __name__ == "__main__":
-    show_transactions()
+    # show_transactions()  # отладочный режим
+    main()  # пользовательский интерфейс
